@@ -5,12 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MyServer Launcher | Вход в игру</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
@@ -19,9 +14,7 @@
             justify-content: center;
             align-items: center;
             padding: 20px;
-            transition: background 0.5s ease;
         }
-
         .container {
             background: rgba(255,255,255,0.1);
             backdrop-filter: blur(15px);
@@ -31,579 +24,224 @@
             width: 100%;
             box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
             border: 1px solid rgba(255,255,255,0.2);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             animation: fadeIn 0.6s ease-out;
         }
-
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-
-        .tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 30px;
-            border-bottom: 2px solid rgba(255,255,255,0.2);
-        }
-
-        .tab {
-            flex: 1;
-            padding: 12px;
-            background: none;
-            border: none;
-            color: rgba(255,255,255,0.6);
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .tab::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 0;
-            width: 0%;
-            height: 3px;
-            background: #ffd700;
-            transition: width 0.3s ease;
-        }
-
-        .tab:hover::after {
-            width: 100%;
-        }
-
-        .tab.active {
-            color: #ffd700;
-        }
-
-        .tab.active::after {
-            width: 100%;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-            animation: slideIn 0.4s ease-out;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateX(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        label {
-            display: block;
-            color: white;
-            margin-bottom: 8px;
-            font-size: 14px;
-        }
-
+        .tabs { display: flex; gap: 10px; margin-bottom: 30px; border-bottom: 2px solid rgba(255,255,255,0.2); }
+        .tab { flex: 1; padding: 12px; background: none; border: none; color: rgba(255,255,255,0.6); font-size: 18px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; }
+        .tab.active { color: #ffd700; border-bottom: 3px solid #ffd700; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; color: white; margin-bottom: 8px; font-size: 14px; }
         input {
-            width: 100%;
-            padding: 12px;
-            background: rgba(255,255,255,0.15);
-            border: 1px solid rgba(255,255,255,0.3);
-            border-radius: 10px;
-            color: white;
-            font-size: 16px;
-            transition: all 0.3s ease;
+            width: 100%; padding: 12px; background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.3); border-radius: 10px;
+            color: white; font-size: 16px; transition: all 0.3s ease;
         }
-
-        input:focus {
-            outline: none;
-            border-color: #ffd700;
-            background: rgba(255,255,255,0.2);
-            transform: scale(1.02);
-        }
-
+        input:focus { outline: none; border-color: #ffd700; background: rgba(255,255,255,0.2); }
         button {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            border: none;
-            border-radius: 10px;
-            color: white;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 10px;
+            width: 100%; padding: 14px; background: linear-gradient(135deg, #667eea, #764ba2);
+            border: none; border-radius: 10px; color: white; font-size: 16px;
+            font-weight: bold; cursor: pointer; transition: all 0.3s ease; margin-top: 10px;
         }
-
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-        }
-
-        button:active {
-            transform: translateY(0);
-        }
-
-        .error {
-            background: rgba(244, 67, 54, 0.2);
-            border: 1px solid #f44336;
-            border-radius: 10px;
-            padding: 10px;
-            margin: 10px 0;
-            color: #ff8a80;
-            font-size: 14px;
-            display: none;
-            animation: shake 0.3s ease;
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
-        }
-
-        .success {
-            background: rgba(76, 175, 80, 0.2);
-            border: 1px solid #4caf50;
-            border-radius: 10px;
-            padding: 10px;
-            margin: 10px 0;
-            color: #81c784;
-            font-size: 14px;
-            display: none;
-            animation: slideIn 0.3s ease;
-        }
-
-        .user-info {
-            background: rgba(0,0,0,0.5);
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
-            display: none;
-            animation: slideIn 0.4s ease-out;
-        }
-
-        .role {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
-            margin-left: 10px;
-        }
-
+        button:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
+        .error { background: rgba(244,67,54,0.2); border: 1px solid #f44336; border-radius: 10px; padding: 10px; margin: 10px 0; color: #ff8a80; display: none; }
+        .success { background: rgba(76,175,80,0.2); border: 1px solid #4caf50; border-radius: 10px; padding: 10px; margin: 10px 0; color: #81c784; display: none; }
+        .user-info { background: rgba(0,0,0,0.5); border-radius: 15px; padding: 20px; margin-bottom: 20px; display: none; }
+        .role { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; margin-left: 10px; }
         .role-admin { background: #f44336; color: white; }
         .role-premium { background: #ffd700; color: #333; }
         .role-user { background: #4caf50; color: white; }
-
-        .logout-btn {
-            background: rgba(244, 67, 54, 0.8);
-            margin-top: 10px;
-        }
-
-        .game-section {
-            display: none;
-            animation: fadeIn 0.5s ease-out;
-        }
-
-        .online-list {
-            background: rgba(0,0,0,0.5);
-            border-radius: 15px;
-            padding: 15px;
-            margin-top: 20px;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-
-        .online-player {
-            padding: 8px;
-            margin: 5px 0;
-            background: rgba(255,255,255,0.1);
-            border-radius: 8px;
-            display: flex;
-            justify-content: space-between;
-            transition: all 0.3s ease;
-        }
-
-        .online-player:hover {
-            background: rgba(255,255,255,0.2);
-            transform: translateX(5px);
-        }
-
-        /* Админ панель */
-        .admin-panel {
-            display: none;
-            animation: fadeIn 0.5s ease-out;
-        }
-
-        .admin-card {
-            background: rgba(0,0,0,0.5);
-            border-radius: 15px;
-            padding: 20px;
-            margin: 15px 0;
-        }
-
-        .user-list-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px;
-            margin: 5px 0;
-            background: rgba(255,255,255,0.1);
-            border-radius: 10px;
-            transition: all 0.3s ease;
-        }
-
-        .user-list-item:hover {
-            background: rgba(255,255,255,0.2);
-        }
-
-        .role-select {
-            padding: 5px;
-            border-radius: 5px;
-            background: rgba(0,0,0,0.7);
-            color: white;
-            border: 1px solid #ffd700;
-        }
-
-        .delete-user {
-            background: #f44336;
-            padding: 5px 10px;
-            width: auto;
-            margin: 0;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        .loading {
-            animation: pulse 1.5s infinite;
-        }
+        .game-section { display: none; }
+        .online-list { background: rgba(0,0,0,0.5); border-radius: 15px; padding: 15px; margin-top: 20px; max-height: 200px; overflow-y: auto; }
+        .online-player { padding: 8px; margin: 5px 0; background: rgba(255,255,255,0.1); border-radius: 8px; display: flex; justify-content: space-between; }
+        .admin-panel { display: none; }
+        .admin-card { background: rgba(0,0,0,0.5); border-radius: 15px; padding: 20px; margin: 15px 0; }
+        .user-list-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; margin: 5px 0; background: rgba(255,255,255,0.1); border-radius: 10px; }
+        .role-select { padding: 5px; border-radius: 5px; background: rgba(0,0,0,0.7); color: white; border: 1px solid #ffd700; }
+        .delete-user { background: #f44336; padding: 5px 10px; width: auto; margin: 0; }
+        .logout-btn { background: rgba(244,67,54,0.8); margin-top: 10px; }
+        .status-badge { font-size: 12px; padding: 2px 8px; border-radius: 12px; background: rgba(0,0,0,0.5); }
     </style>
 </head>
 <body>
 <div class="container" id="app">
-    <!-- Аудио элемент -->
-    <audio id="clickSound" preload="auto">
-        <source src="data:audio/wav;base64,U3RlYWx0aCBzb3VuZCBkYXRh" type="audio/wav">
-    </audio>
-    <audio id="successSound" preload="auto">
-        <source src="https://www.soundjay.com/misc/sounds/applause-01.mp3" type="audio/mpeg">
-    </audio>
-    <audio id="errorSound" preload="auto">
-        <source src="https://www.soundjay.com/misc/sounds/error-01.mp3" type="audio/mpeg">
-    </audio>
-
-    <!-- Вкладки входа/регистрации -->
+    <!-- Будет заполнено JS -->
     <div id="authTabs">
         <div class="tabs">
-            <button class="tab active" onclick="switchTab('login'); playClick()">🔑 Вход</button>
-            <button class="tab" onclick="switchTab('register'); playClick()">📝 Регистрация</button>
+            <button class="tab active" onclick="switchTab('login')">🔑 Вход</button>
+            <button class="tab" onclick="switchTab('register')">📝 Регистрация</button>
         </div>
-
         <div id="errorMsg" class="error"></div>
         <div id="successMsg" class="success"></div>
-
-        <!-- Форма входа -->
         <div id="loginForm">
-            <div class="form-group">
-                <label>👤 Логин</label>
-                <input type="text" id="loginUsername" placeholder="Введите логин">
-            </div>
-            <div class="form-group">
-                <label>🔒 Пароль</label>
-                <input type="password" id="loginPassword" placeholder="Введите пароль">
-            </div>
-            <button onclick="login(); playClick()">Войти</button>
-            <button onclick="showAdminLogin(); playClick()" style="background: rgba(0,0,0,0.5); margin-top: 10px;">👑 Вход в админ-панель</button>
+            <div class="form-group"><label>👤 Логин</label><input type="text" id="loginUsername" placeholder="Введите логин"></div>
+            <div class="form-group"><label>🔒 Пароль</label><input type="password" id="loginPassword" placeholder="Введите пароль"></div>
+            <button onclick="login()">Войти</button>
+            <button onclick="showAdminLogin()" style="background: rgba(0,0,0,0.5); margin-top: 10px;">👑 Вход в админ-панель</button>
         </div>
-
-        <!-- Форма регистрации -->
         <div id="registerForm" style="display: none;">
-            <div class="form-group">
-                <label>👤 Логин</label>
-                <input type="text" id="regUsername" placeholder="От 3 до 16 символов">
-            </div>
-            <div class="form-group">
-                <label>📧 Email</label>
-                <input type="email" id="regEmail" placeholder="example@mail.com">
-            </div>
-            <div class="form-group">
-                <label>🔒 Пароль</label>
-                <input type="password" id="regPassword" placeholder="Не менее 6 символов">
-            </div>
-            <div class="form-group">
-                <label>🔒 Подтвердите пароль</label>
-                <input type="password" id="regConfirmPassword" placeholder="Повторите пароль">
-            </div>
-            <button onclick="register(); playClick()">Зарегистрироваться</button>
+            <div class="form-group"><label>👤 Логин</label><input type="text" id="regUsername" placeholder="От 3 до 16 символов"></div>
+            <div class="form-group"><label>📧 Email</label><input type="email" id="regEmail" placeholder="example@mail.com"></div>
+            <div class="form-group"><label>🔒 Пароль</label><input type="password" id="regPassword" placeholder="Не менее 6 символов"></div>
+            <div class="form-group"><label>🔒 Подтвердите пароль</label><input type="password" id="regConfirmPassword" placeholder="Повторите пароль"></div>
+            <button onclick="register()">Зарегистрироваться</button>
         </div>
     </div>
-
-    <!-- Админ логин -->
     <div id="adminLoginForm" style="display: none;">
-        <div class="form-group">
-            <label>👑 Админ логин</label>
-            <input type="text" id="adminUsername" placeholder="admin">
-        </div>
-        <div class="form-group">
-            <label>🔒 Админ пароль</label>
-            <input type="password" id="adminPassword" placeholder="********">
-        </div>
-        <button onclick="adminLogin(); playClick()">Войти в админку</button>
-        <button onclick="backToUserLogin(); playClick()" style="background: rgba(0,0,0,0.5);">← Назад</button>
+        <div class="form-group"><label>👑 Админ логин</label><input type="text" id="adminUsername" placeholder="admin"></div>
+        <div class="form-group"><label>🔒 Админ пароль</label><input type="password" id="adminPassword" placeholder="********"></div>
+        <button onclick="adminLogin()">Войти в админку</button>
+        <button onclick="backToUserLogin()" style="background: rgba(0,0,0,0.5);">← Назад</button>
     </div>
-
-    <!-- Панель пользователя -->
-    <div id="userPanel" class="user-info">
+    <div id="userPanel" class="user-info" style="display: none;">
         <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div>
-                👋 Привет, <strong id="userName"></strong>
-                <span id="userRole" class="role"></span>
-            </div>
-            <button onclick="logout(); playClick()" class="logout-btn" style="width: auto; padding: 5px 15px;">🚪 Выйти</button>
+            <div>👋 Привет, <strong id="userName"></strong><span id="userRole" class="role"></span></div>
+            <button onclick="logout()" class="logout-btn" style="width: auto; padding: 5px 15px;">🚪 Выйти</button>
         </div>
-        <div style="margin-top: 15px; font-size: 14px;">
-            📅 Зарегистрирован: <span id="regDate"></span>
-        </div>
+        <div style="margin-top: 15px; font-size: 14px;">📅 Зарегистрирован: <span id="regDate"></span></div>
     </div>
-
-    <!-- Секция с установкой игры -->
-    <div id="gameSection" class="game-section">
+    <div id="gameSection" class="game-section" style="display: none;">
         <div style="text-align: center; margin: 20px 0;">
             <div style="font-size: 48px;">🎮</div>
             <h3 style="color: white;">MY AWESOME SERVER</h3>
             <p style="color: rgba(255,255,255,0.7); font-size: 14px;">Версия 1.20.4 | Minecraft Java Edition</p>
         </div>
-
-        <button id="installGameBtn" onclick="installGame(); playClick()">
-            📥 Установить игру на диск D:
-        </button>
-        <button id="playGameBtn" onclick="launchGame(); playClick()" style="display: none;">
-            🎮 ЗАПУСТИТЬ ИГРУ
-        </button>
-
+        <button id="installGameBtn" onclick="installGame()">📥 Установить игру на диск D:</button>
+        <button id="playGameBtn" onclick="launchGame()" style="display: none;">🎮 ЗАПУСТИТЬ ИГРУ</button>
         <div class="online-list">
             <div style="font-weight: bold; margin-bottom: 10px;">🟢 Онлайн игроки (<span id="onlineCount">0</span>)</div>
-            <div id="onlinePlayersList">
-                <div style="text-align: center; color: rgba(255,255,255,0.5);">Загрузка...</div>
-            </div>
+            <div id="onlinePlayersList">Загрузка...</div>
         </div>
     </div>
-
-    <!-- Админ панель -->
-    <div id="adminPanel" class="admin-panel">
+    <div id="adminPanel" class="admin-panel" style="display: none;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
             <h2 style="color: white;">👑 Админ панель</h2>
-            <button onclick="exitAdmin(); playClick()" style="width: auto; padding: 5px 15px; background: #f44336;">Выйти</button>
+            <button onclick="exitAdmin()" style="width: auto; padding: 5px 15px; background: #f44336;">Выйти</button>
         </div>
-        
         <div class="admin-card">
             <h3 style="color: white; margin-bottom: 15px;">📊 Статистика сервера</h3>
             <p style="color: white;">👥 Всего игроков: <strong id="totalUsers">0</strong></p>
             <p style="color: white;">🟢 Онлайн сейчас: <strong id="adminOnlineCount">0</strong></p>
             <p style="color: white;">📦 Игра установлена у: <strong id="installedCount">0</strong></p>
         </div>
-
         <div class="admin-card">
             <h3 style="color: white; margin-bottom: 15px;">👥 Управление игроками</h3>
             <div id="usersList"></div>
         </div>
-
         <div class="admin-card">
             <h3 style="color: white; margin-bottom: 15px;">🔧 Настройки сервера</h3>
             <div class="form-group">
                 <label>Ссылка на версию Minecraft</label>
                 <input type="text" id="gameUrlSetting" value="https://workupload.com/file/GgquRNsLkWn">
             </div>
-            <button onclick="updateGameUrl(); playClick()">Сохранить</button>
+            <button onclick="updateGameUrl()">Сохранить</button>
         </div>
     </div>
 </div>
 
 <script>
-    // Звуки
-    function playClick() {
-        const click = document.getElementById('clickSound');
-        click.currentTime = 0;
-        click.play().catch(e => console.log('Звук не загружен'));
-    }
-    
-    function playSuccess() {
-        const success = document.getElementById('successSound');
-        success.currentTime = 0;
-        success.play().catch(e => console.log('Звук не загружен'));
-    }
-    
-    function playError() {
-        const error = document.getElementById('errorSound');
-        error.currentTime = 0;
-        error.play().catch(e => console.log('Звук не загружен'));
-    }
-    
-    // Конфиг
-    const GAME_URL = "https://workupload.com/file/GgquRNsLkWn";
+    // API URL - ЗАМЕНИТЕ НА ВАШ РЕНДЕР URL ПОСЛЕ ДЕПЛОЯ!
+    const API_URL = "https://ВАШ_СЕРВЕР.onrender.com";
     const GAME_DIR = "D:\\MyServerMinecraft";
     const LAUNCHER_EXE = "start.bat";
     
-    // Админ учетка
-    const ADMIN_CREDENTIALS = {
-        username: 'admin',
-        password: btoa('admin123') // Пароль: admin123
-    };
+    let currentUser = null;
     
     // Регистрация
-    function register() {
+    async function register() {
         const username = document.getElementById('regUsername').value.trim();
         const email = document.getElementById('regEmail').value.trim();
         const password = document.getElementById('regPassword').value;
         const confirm = document.getElementById('regConfirmPassword').value;
         
         if (username.length < 3 || username.length > 16) {
-            showError('Логин должен быть от 3 до 16 символов');
-            playError();
-            return;
+            showError('Логин от 3 до 16 символов'); return;
         }
         if (!email.includes('@')) {
-            showError('Введите корректный email');
-            playError();
-            return;
+            showError('Введите корректный email'); return;
         }
         if (password.length < 6) {
-            showError('Пароль должен быть не менее 6 символов');
-            playError();
-            return;
+            showError('Пароль не менее 6 символов'); return;
         }
         if (password !== confirm) {
-            showError('Пароли не совпадают');
-            playError();
-            return;
+            showError('Пароли не совпадают'); return;
         }
         
-        let users = JSON.parse(localStorage.getItem('mc_users') || '{}');
-        if (users[username]) {
-            showError('Пользователь с таким логином уже существует');
-            playError();
-            return;
+        try {
+            const response = await fetch(`${API_URL}/api/register`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, email, password })
+            });
+            const data = await response.json();
+            
+            if (data.success) {
+                showSuccess('Регистрация успешна! Теперь войдите');
+                setTimeout(() => switchTab('login'), 1500);
+            } else {
+                showError(data.error);
+            }
+        } catch (error) {
+            showError('Ошибка сервера: ' + error.message);
         }
-        
-        users[username] = {
-            username: username,
-            email: email,
-            password: btoa(password),
-            role: 'user',
-            registered: new Date().toISOString(),
-            lastLogin: null,
-            gameInstalled: false
-        };
-        
-        localStorage.setItem('mc_users', JSON.stringify(users));
-        showSuccess('Регистрация успешна! Теперь войдите');
-        playSuccess();
-        
-        document.getElementById('regUsername').value = '';
-        document.getElementById('regEmail').value = '';
-        document.getElementById('regPassword').value = '';
-        document.getElementById('regConfirmPassword').value = '';
-        
-        setTimeout(() => switchTab('login'), 1500);
     }
     
     // Вход
-    function login() {
+    async function login() {
         const username = document.getElementById('loginUsername').value.trim();
         const password = document.getElementById('loginPassword').value;
         
         if (!username || !password) {
-            showError('Введите логин и пароль');
-            playError();
-            return;
+            showError('Введите логин и пароль'); return;
         }
         
-        let users = JSON.parse(localStorage.getItem('mc_users') || '{}');
-        const user = users[username];
-        
-        if (!user || user.password !== btoa(password)) {
-            showError('Неверный логин или пароль');
-            playError();
-            return;
+        try {
+            const response = await fetch(`${API_URL}/api/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+            const data = await response.json();
+            
+            if (data.success) {
+                currentUser = data.user;
+                localStorage.setItem('current_user', JSON.stringify(currentUser));
+                showSuccess('Вход выполнен!');
+                loadUserPanel();
+                document.getElementById('authTabs').style.display = 'none';
+                document.getElementById('userPanel').style.display = 'block';
+                document.getElementById('gameSection').style.display = 'block';
+            } else {
+                showError(data.error);
+            }
+        } catch (error) {
+            showError('Ошибка сервера: ' + error.message);
         }
-        
-        user.lastLogin = new Date().toISOString();
-        users[username] = user;
-        localStorage.setItem('mc_users', JSON.stringify(users));
-        localStorage.setItem('current_user', username);
-        
-        showSuccess('Вход выполнен!');
-        playSuccess();
-        
-        loadUserPanel(username);
-        
-        document.getElementById('authTabs').style.display = 'none';
-        document.getElementById('userPanel').style.display = 'block';
-        document.getElementById('gameSection').style.display = 'block';
     }
     
-    // Загрузка панели пользователя
-    function loadUserPanel(username) {
-        let users = JSON.parse(localStorage.getItem('mc_users') || '{}');
-        const user = users[username];
-        
-        document.getElementById('userName').innerText = user.username;
-        document.getElementById('regDate').innerText = new Date(user.registered).toLocaleDateString();
-        
+    function loadUserPanel() {
+        document.getElementById('userName').innerText = currentUser.username;
+        document.getElementById('regDate').innerText = new Date(currentUser.registered).toLocaleDateString();
         const roleSpan = document.getElementById('userRole');
-        roleSpan.innerText = user.role === 'admin' ? 'Администратор' : (user.role === 'premium' ? 'Premium' : 'Игрок');
-        roleSpan.className = `role role-${user.role === 'admin' ? 'admin' : (user.role === 'premium' ? 'premium' : 'user')}`;
-        
+        roleSpan.innerText = currentUser.role === 'admin' ? 'Администратор' : (currentUser.role === 'premium' ? 'Premium' : 'Игрок');
+        roleSpan.className = `role role-${currentUser.role === 'admin' ? 'admin' : (currentUser.role === 'premium' ? 'premium' : 'user')}`;
         checkGameInstalled();
         loadOnlinePlayers();
         setInterval(loadOnlinePlayers, 30000);
     }
     
     function checkGameInstalled() {
-        const installed = localStorage.getItem('game_installed') === 'true';
-        const installBtn = document.getElementById('installGameBtn');
-        const playBtn = document.getElementById('playGameBtn');
-        
-        if (installed) {
-            installBtn.style.display = 'none';
-            playBtn.style.display = 'block';
-        } else {
-            installBtn.style.display = 'block';
-            playBtn.style.display = 'none';
-        }
+        const installed = currentUser.gameInstalled;
+        document.getElementById('installGameBtn').style.display = installed ? 'none' : 'block';
+        document.getElementById('playGameBtn').style.display = installed ? 'block' : 'none';
     }
     
-    function installGame() {
-        const installerScript = `@echo off
-title Установка Minecraft - MY AWESOME SERVER
-echo ========================================
-echo   Установка на диск D: для %USERNAME%
-echo ========================================
-mkdir "${GAME_DIR}" 2>nul
-cd /d "${GAME_DIR}"
-echo Скачивание игры...
-powershell -Command "Invoke-WebRequest -Uri '${GAME_URL}' -OutFile 'game.zip'"
-echo Распаковка...
-powershell -Command "Expand-Archive -Path 'game.zip' -DestinationPath '${GAME_DIR}' -Force"
-del "game.zip"
-echo Установка завершена!
-echo Запустите лаунчер снова и нажмите "Запустить игру"
-pause
-`;
-        
+    async function installGame() {
+        const GAME_URL = document.getElementById('gameUrlSetting')?.value || "https://workupload.com/file/GgquRNsLkWn";
+        const installerScript = `@echo off\ntitle Установка Minecraft\necho Установка на диск D:\nmkdir "${GAME_DIR}" 2>nul\ncd /d "${GAME_DIR}"\npowershell -Command "Invoke-WebRequest -Uri '${GAME_URL}' -OutFile 'game.zip'"\npowershell -Command "Expand-Archive -Path 'game.zip' -DestinationPath '${GAME_DIR}' -Force"\ndel "game.zip"\necho Установка завершена!\npause`;
         const blob = new Blob([installerScript], {type: 'application/bat'});
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -614,25 +252,19 @@ pause
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
         
-        localStorage.setItem('game_installed', 'true');
-        showSuccess('Установщик скачан! Запустите его');
-        playSuccess();
+        // Обновляем статус на сервере
+        await fetch(`${API_URL}/api/update-installed`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: currentUser.username, installed: true })
+        });
+        currentUser.gameInstalled = true;
+        showSuccess('Установщик скачан!');
         setTimeout(() => checkGameInstalled(), 2000);
     }
     
     function launchGame() {
-        const launchScript = `@echo off
-cd /d "${GAME_DIR}"
-if not exist "${LAUNCHER_EXE}" (
-    echo Игра не установлена! Запустите установку.
-    pause
-    exit /b 1
-)
-echo Запуск MY AWESOME SERVER...
-start "" "${LAUNCHER_EXE}"
-exit
-`;
-        
+        const launchScript = `@echo off\ncd /d "${GAME_DIR}"\nif not exist "${LAUNCHER_EXE}" ( echo Игра не установлена! pause exit /b 1 )\nstart "" "${LAUNCHER_EXE}"\nexit`;
         const blob = new Blob([launchScript], {type: 'application/bat'});
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -642,42 +274,26 @@ exit
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-        
         showSuccess('Файл запуска скачан!');
-        playSuccess();
     }
     
-    function loadOnlinePlayers() {
-        const currentUser = localStorage.getItem('current_user');
-        let users = JSON.parse(localStorage.getItem('mc_users') || '{}');
-        
-        const online = Object.values(users).filter(u => {
-            if (!u.lastLogin) return false;
-            const lastLogin = new Date(u.lastLogin);
-            const now = new Date();
-            const diffHours = (now - lastLogin) / (1000 * 60 * 60);
-            return diffHours < 2;
-        });
-        
-        document.getElementById('onlineCount').innerText = online.length;
-        
-        const container = document.getElementById('onlinePlayersList');
-        if (online.length === 0) {
-            container.innerHTML = '<div style="text-align: center; color: rgba(255,255,255,0.5);">👻 Никого нет онлайн</div>';
-            return;
+    async function loadOnlinePlayers() {
+        try {
+            const response = await fetch(`${API_URL}/api/online`);
+            const data = await response.json();
+            document.getElementById('onlineCount').innerText = data.count;
+            const container = document.getElementById('onlinePlayersList');
+            if (data.online.length === 0) {
+                container.innerHTML = '<div style="text-align: center;">👻 Никого нет онлайн</div>';
+                return;
+            }
+            container.innerHTML = data.online.map(u => `<div class="online-player"><span>🎮 ${u.username}</span><span class="status-badge">${u.role === 'admin' ? '👑 Админ' : (u.role === 'premium' ? '⭐ Premium' : '🟢 Игрок')}</span></div>`).join('');
+        } catch (error) {
+            console.error('Ошибка загрузки онлайн:', error);
         }
-        
-        container.innerHTML = online.map(u => `
-            <div class="online-player">
-                <span>🎮 ${u.username}</span>
-                <span class="status-badge">
-                    ${u.role === 'admin' ? '👑 Админ' : (u.role === 'premium' ? '⭐ Premium' : '🟢 Игрок')}
-                </span>
-            </div>
-        `).join('');
     }
     
-    // Админ панель
+    // Админ функции
     function showAdminLogin() {
         document.getElementById('authTabs').style.display = 'none';
         document.getElementById('adminLoginForm').style.display = 'block';
@@ -689,44 +305,46 @@ exit
         document.getElementById('adminPanel').style.display = 'none';
     }
     
-    function adminLogin() {
+    let adminAuth = { username: null, password: null };
+    
+    async function adminLogin() {
         const username = document.getElementById('adminUsername').value;
         const password = document.getElementById('adminPassword').value;
         
-        if (username === ADMIN_CREDENTIALS.username && btoa(password) === ADMIN_CREDENTIALS.password) {
-            showSuccess('Вход в админ-панель');
-            playSuccess();
-            loadAdminPanel();
-            document.getElementById('adminLoginForm').style.display = 'none';
-            document.getElementById('adminPanel').style.display = 'block';
-        } else {
-            showError('Неверный логин или пароль админа');
-            playError();
+        adminAuth = { username, password };
+        
+        try {
+            const response = await fetch(`${API_URL}/api/users`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ adminUsername: username, adminPassword: password })
+            });
+            const data = await response.json();
+            
+            if (data.success) {
+                showSuccess('Вход в админ-панель');
+                loadAdminPanel(data.users);
+                document.getElementById('adminLoginForm').style.display = 'none';
+                document.getElementById('adminPanel').style.display = 'block';
+            } else {
+                showError(data.error);
+            }
+        } catch (error) {
+            showError('Ошибка: ' + error.message);
         }
     }
     
-    function loadAdminPanel() {
-        let users = JSON.parse(localStorage.getItem('mc_users') || '{}');
-        const usersArray = Object.values(users);
-        
-        document.getElementById('totalUsers').innerText = usersArray.length;
-        
-        const online = usersArray.filter(u => {
-            if (!u.lastLogin) return false;
-            const diffHours = (new Date() - new Date(u.lastLogin)) / (1000 * 60 * 60);
-            return diffHours < 2;
-        });
+    function loadAdminPanel(users) {
+        document.getElementById('totalUsers').innerText = users.length;
+        const online = users.filter(u => u.lastLogin && (new Date() - new Date(u.lastLogin)) < 2*60*60*1000);
         document.getElementById('adminOnlineCount').innerText = online.length;
+        document.getElementById('installedCount').innerText = users.filter(u => u.gameInstalled).length;
         
-        const installed = usersArray.filter(u => u.gameInstalled).length;
-        document.getElementById('installedCount').innerText = installed;
-        
-        const usersListDiv = document.getElementById('usersList');
-        usersListDiv.innerHTML = usersArray.map(u => `
+        document.getElementById('usersList').innerHTML = users.map(u => `
             <div class="user-list-item">
                 <div>
                     <strong>${u.username}</strong><br>
-                    <small>${u.email} | ${new Date(u.registered).toLocaleDateString()}</small>
+                    <small>${u.email}</small>
                 </div>
                 <div>
                     <select class="role-select" onchange="changeRole('${u.username}', this.value)">
@@ -734,35 +352,39 @@ exit
                         <option value="premium" ${u.role === 'premium' ? 'selected' : ''}>⭐ Premium</option>
                         <option value="admin" ${u.role === 'admin' ? 'selected' : ''}>👑 Админ</option>
                     </select>
-                    <button class="delete-user" onclick="deleteUser('${u.username}')">Удалить</button>
                 </div>
             </div>
         `).join('');
     }
     
-    function changeRole(username, newRole) {
-        let users = JSON.parse(localStorage.getItem('mc_users') || '{}');
-        if (users[username]) {
-            users[username].role = newRole;
-            localStorage.setItem('mc_users', JSON.stringify(users));
-            showSuccess(`Роль ${username} изменена`);
-            playSuccess();
-            loadAdminPanel();
-            
-            if (localStorage.getItem('current_user') === username) {
-                loadUserPanel(username);
+    async function changeRole(username, newRole) {
+        try {
+            const response = await fetch(`${API_URL}/api/update-role`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    adminUsername: adminAuth.username,
+                    adminPassword: adminAuth.password,
+                    targetUsername: username,
+                    newRole: newRole
+                })
+            });
+            const data = await response.json();
+            if (data.success) {
+                showSuccess(`Роль ${username} изменена`);
+                // Перезагружаем админку
+                const usersResp = await fetch(`${API_URL}/api/users`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ adminUsername: adminAuth.username, adminPassword: adminAuth.password })
+                });
+                const usersData = await usersResp.json();
+                if (usersData.success) loadAdminPanel(usersData.users);
+            } else {
+                showError(data.error);
             }
-        }
-    }
-    
-    function deleteUser(username) {
-        if (confirm(`Удалить игрока ${username}?`)) {
-            let users = JSON.parse(localStorage.getItem('mc_users') || '{}');
-            delete users[username];
-            localStorage.setItem('mc_users', JSON.stringify(users));
-            showSuccess(`Игрок ${username} удален`);
-            playSuccess();
-            loadAdminPanel();
+        } catch (error) {
+            showError('Ошибка: ' + error.message);
         }
     }
     
@@ -775,12 +397,12 @@ exit
     function updateGameUrl() {
         const newUrl = document.getElementById('gameUrlSetting').value;
         localStorage.setItem('game_url', newUrl);
-        showSuccess('Ссылка обновлена');
-        playSuccess();
+        showSuccess('Ссылка обновлена локально');
     }
     
     function logout() {
         localStorage.removeItem('current_user');
+        currentUser = null;
         location.reload();
     }
     
@@ -788,9 +410,7 @@ exit
         const loginForm = document.getElementById('loginForm');
         const registerForm = document.getElementById('registerForm');
         const tabs = document.querySelectorAll('.tab');
-        
         tabs.forEach(t => t.classList.remove('active'));
-        
         if (tab === 'login') {
             loginForm.style.display = 'block';
             registerForm.style.display = 'none';
@@ -800,7 +420,6 @@ exit
             registerForm.style.display = 'block';
             tabs[1].classList.add('active');
         }
-        
         hideMessages();
     }
     
@@ -824,21 +443,18 @@ exit
     }
     
     window.onload = function() {
-        const currentUser = localStorage.getItem('current_user');
-        if (currentUser) {
-            let users = JSON.parse(localStorage.getItem('mc_users') || '{}');
-            if (users[currentUser]) {
-                document.getElementById('authTabs').style.display = 'none';
-                document.getElementById('userPanel').style.display = 'block';
-                document.getElementById('gameSection').style.display = 'block';
-                loadUserPanel(currentUser);
-                return;
-            }
+        const savedUser = localStorage.getItem('current_user');
+        if (savedUser) {
+            currentUser = JSON.parse(savedUser);
+            document.getElementById('authTabs').style.display = 'none';
+            document.getElementById('userPanel').style.display = 'block';
+            document.getElementById('gameSection').style.display = 'block';
+            loadUserPanel();
+        } else {
+            document.getElementById('authTabs').style.display = 'block';
+            document.getElementById('userPanel').style.display = 'none';
+            document.getElementById('gameSection').style.display = 'none';
         }
-        
-        document.getElementById('authTabs').style.display = 'block';
-        document.getElementById('userPanel').style.display = 'none';
-        document.getElementById('gameSection').style.display = 'none';
     };
 </script>
 </body>
