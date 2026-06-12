@@ -25,7 +25,10 @@ def save_users(users):
 def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
 
-# Регистрация
+# Секретный ключ для создания администратора (ИЗМЕНИТЕ НА СВОЙ!)
+ADMIN_SECRET = "mysupersecretkey2024"
+
+# ============= РЕГИСТРАЦИЯ =============
 @app.route('/api/register', methods=['POST'])
 def register():
     data = request.json
@@ -51,7 +54,7 @@ def register():
     save_users(users)
     return jsonify({'success': True, 'message': 'Регистрация успешна'})
 
-# Вход
+# ============= ВХОД =============
 @app.route('/api/login', methods=['POST'])
 def login():
     data = request.json
@@ -81,7 +84,28 @@ def login():
         }
     })
 
-# Получить всех пользователей (только для админа)
+# ============= СОЗДАНИЕ АДМИНИСТРАТОРА (НОВОЕ!) =============
+@app.route('/api/make-admin', methods=['POST'])
+def make_admin():
+    """Создает администратора. Требует секретный ключ."""
+    data = request.json
+    username = data.get('username')
+    secret = data.get('secret')
+    
+    if secret != ADMIN_SECRET:
+        return jsonify({'success': False, 'error': 'Неверный секретный ключ'}), 403
+    
+    users = load_users()
+    
+    if username not in users:
+        return jsonify({'success': False, 'error': 'Пользователь не найден'}), 404
+    
+    users[username]['role'] = 'admin'
+    save_users(users)
+    
+    return jsonify({'success': True, 'message': f'{username} теперь администратор'})
+
+# ============= ПОЛУЧИТЬ ВСЕХ ПОЛЬЗОВАТЕЛЕЙ (ТОЛЬКО ДЛЯ АДМИНА) =============
 @app.route('/api/users', methods=['POST'])
 def get_users():
     data = request.json
@@ -111,7 +135,7 @@ def get_users():
     
     return jsonify({'success': True, 'users': safe_users})
 
-# Обновить роль пользователя
+# ============= ОБНОВИТЬ РОЛЬ ПОЛЬЗОВАТЕЛЯ =============
 @app.route('/api/update-role', methods=['POST'])
 def update_role():
     data = request.json
@@ -136,7 +160,7 @@ def update_role():
     
     return jsonify({'success': True, 'message': 'Роль обновлена'})
 
-# Обновить статус установки игры
+# ============= ОБНОВИТЬ СТАТУС УСТАНОВКИ ИГРЫ =============
 @app.route('/api/update-installed', methods=['POST'])
 def update_installed():
     data = request.json
@@ -153,7 +177,7 @@ def update_installed():
     
     return jsonify({'success': True})
 
-# Получить онлайн игроков (кто заходил за последние 2 часа)
+# ============= ПОЛУЧИТЬ ОНЛАЙН ИГРОКОВ =============
 @app.route('/api/online', methods=['GET'])
 def get_online():
     users = load_users()
@@ -162,15 +186,19 @@ def get_online():
     
     for u in users.values():
         if u['lastLogin']:
-            last = datetime.fromisoformat(u['lastLogin'])
-            if now - last < timedelta(hours=2):
-                online.append({
-                    'username': u['username'],
-                    'role': u['role']
-                })
+            try:
+                last = datetime.fromisoformat(u['lastLogin'])
+                if now - last < timedelta(hours=2):
+                    online.append({
+                        'username': u['username'],
+                        'role': u['role']
+                    })
+            except:
+                pass
     
     return jsonify({'online': online, 'count': len(online)})
 
+# ============= ЗАПУСК СЕРВЕРА =============
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
