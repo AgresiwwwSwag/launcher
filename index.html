@@ -47,7 +47,6 @@
             font-weight: bold; cursor: pointer; transition: all 0.3s ease; margin-top: 10px;
         }
         button:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
-        button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
         .error { background: rgba(244,67,54,0.2); border: 1px solid #f44336; border-radius: 10px; padding: 10px; margin: 10px 0; color: #ff8a80; display: none; }
         .success { background: rgba(76,175,80,0.2); border: 1px solid #4caf50; border-radius: 10px; padding: 10px; margin: 10px 0; color: #81c784; display: none; }
         .user-info { background: rgba(0,0,0,0.5); border-radius: 15px; padding: 20px; margin-bottom: 20px; display: none; }
@@ -62,32 +61,48 @@
         .admin-card { background: rgba(0,0,0,0.5); border-radius: 15px; padding: 20px; margin: 15px 0; }
         .user-list-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; margin: 5px 0; background: rgba(255,255,255,0.1); border-radius: 10px; flex-wrap: wrap; gap: 10px; }
         .role-select { padding: 5px; border-radius: 5px; background: rgba(0,0,0,0.7); color: white; border: 1px solid #ffd700; }
-        .delete-user { background: #f44336; padding: 5px 10px; width: auto; margin: 0; }
         .logout-btn { background: rgba(244,67,54,0.8); margin-top: 10px; }
-        .status-badge { font-size: 12px; padding: 2px 8px; border-radius: 12px; background: rgba(0,0,0,0.5); }
-        .loading-spinner {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 2px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 0.6s linear infinite;
-            margin-right: 8px;
-        }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        .download-toast {
+        .modal {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 9999;
-            animation: slideInRight 0.3s ease-out;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            animation: fadeIn 0.2s ease;
         }
-        @keyframes slideInRight {
-            from { transform: translateX(400px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+        .modal-content {
+            background: #1e1e2e;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            border: 2px solid #ffd700;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+        .instruction-step {
+            background: rgba(255,255,255,0.1);
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .step-number {
+            width: 30px;
+            height: 30px;
+            background: #ffd700;
+            color: #333;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -167,38 +182,21 @@
 </div>
 
 <script>
-    // ============= КОНФИГУРАЦИЯ =============
     const API_URL = "https://launcher-server-ddk3.onrender.com";
     const GAME_DIR = "D:\\PolitMine";
-    const LAUNCHER_EXE = "start.bat";
     
     let currentUser = null;
-    let installInterval = null;
     
-    // ============= РЕГИСТРАЦИЯ =============
     async function register() {
         const username = document.getElementById('regUsername').value.trim();
         const email = document.getElementById('regEmail').value.trim();
         const password = document.getElementById('regPassword').value;
         const confirm = document.getElementById('regConfirmPassword').value;
         
-        if (username.length < 3 || username.length > 16) {
-            showError('Логин от 3 до 16 символов'); return;
-        }
-        if (!email.includes('@')) {
-            showError('Введите корректный email'); return;
-        }
-        if (password.length < 6) {
-            showError('Пароль не менее 6 символов'); return;
-        }
-        if (password !== confirm) {
-            showError('Пароли не совпадают'); return;
-        }
-        
-        const btn = event.target;
-        const originalText = btn.innerText;
-        btn.innerHTML = '<span class="loading-spinner"></span> Регистрация...';
-        btn.disabled = true;
+        if (username.length < 3 || username.length > 16) { showError('Логин от 3 до 16 символов'); return; }
+        if (!email.includes('@')) { showError('Введите корректный email'); return; }
+        if (password.length < 6) { showError('Пароль не менее 6 символов'); return; }
+        if (password !== confirm) { showError('Пароли не совпадают'); return; }
         
         try {
             const response = await fetch(`${API_URL}/api/register`, {
@@ -207,7 +205,6 @@
                 body: JSON.stringify({ username, email, password })
             });
             const data = await response.json();
-            
             if (data.success) {
                 showSuccess('Регистрация успешна! Теперь войдите');
                 setTimeout(() => switchTab('login'), 1500);
@@ -216,25 +213,13 @@
             }
         } catch (error) {
             showError('Ошибка сервера: ' + error.message);
-        } finally {
-            btn.innerHTML = originalText;
-            btn.disabled = false;
         }
     }
     
-    // ============= ВХОД =============
     async function login() {
         const username = document.getElementById('loginUsername').value.trim();
         const password = document.getElementById('loginPassword').value;
-        
-        if (!username || !password) {
-            showError('Введите логин и пароль'); return;
-        }
-        
-        const btn = event.target;
-        const originalText = btn.innerText;
-        btn.innerHTML = '<span class="loading-spinner"></span> Вход...';
-        btn.disabled = true;
+        if (!username || !password) { showError('Введите логин и пароль'); return; }
         
         try {
             const response = await fetch(`${API_URL}/api/login`, {
@@ -243,7 +228,6 @@
                 body: JSON.stringify({ username, password })
             });
             const data = await response.json();
-            
             if (data.success) {
                 currentUser = data.user;
                 localStorage.setItem('current_user', JSON.stringify(currentUser));
@@ -257,13 +241,9 @@
             }
         } catch (error) {
             showError('Ошибка сервера: ' + error.message);
-        } finally {
-            btn.innerHTML = originalText;
-            btn.disabled = false;
         }
     }
     
-    // ============= ПАНЕЛЬ ПОЛЬЗОВАТЕЛЯ =============
     function loadUserPanel() {
         document.getElementById('userName').innerText = currentUser.username;
         document.getElementById('regDate').innerText = new Date(currentUser.registered).toLocaleDateString();
@@ -281,13 +261,51 @@
         document.getElementById('playGameBtn').style.display = installed ? 'block' : 'none';
     }
     
-    // ============= УСТАНОВКА ИГРЫ =============
-    async function installGame() {
-        const GAME_URL = document.getElementById('gameUrlSetting')?.value || "https://github.com/AgresiwwSwag/launcher/releases/download/v1.0/politmine.zip";
+    function showInstructions() {
+        const modal = document.createElement('div');
+        modal.className = 'modal';
+        modal.innerHTML = `
+            <div class="modal-content">
+                <h2 style="color: #ffd700; margin-bottom: 20px;">📖 Инструкция по установке</h2>
+                <div class="instruction-step">
+                    <div class="step-number">1</div>
+                    <div>Скачайте файл <strong>PolitMine_Setup.bat</strong></div>
+                </div>
+                <div class="instruction-step">
+                    <div class="step-number">2</div>
+                    <div>Найдите скачанный файл в папке <strong>Загрузки</strong></div>
+                </div>
+                <div class="instruction-step">
+                    <div class="step-number">3</div>
+                    <div>Запустите файл <strong>ПРАВОЙ КНОПКОЙ МЫШИ</strong> → <strong>"Запуск от имени администратора"</strong></div>
+                </div>
+                <div class="instruction-step">
+                    <div class="step-number">4</div>
+                    <div>Если Windows покажет предупреждение, нажмите <strong>"Подробнее"</strong> → <strong>"Выполнить в любом случае"</strong></div>
+                </div>
+                <div class="instruction-step">
+                    <div class="step-number">5</div>
+                    <div>Дождитесь окончания установки (около 2-5 минут)</div>
+                </div>
+                <div class="instruction-step">
+                    <div class="step-number">6</div>
+                    <div>Вернитесь в лаунчер и нажмите <strong>"ЗАПУСТИТЬ ИГРУ"</strong></div>
+                </div>
+                <button onclick="this.closest('.modal').remove()" style="margin-top: 20px; background: #4caf50;">Понятно, приступаю!</button>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+    
+    function installGame() {
+        const GAME_URL = "https://github.com/AgresiwwSwag/launcher/releases/download/v1.0/politmine.zip";
         
-        const installerScript = `@echo off
-chcp 65001 >nul
+        // Создаём BAT файл с правильной кодировкой ANSI (Windows-1251)
+        const batContent = `@echo off
+chcp 1251 > nul
 title PolitMine - Установка
+color 0A
+echo.
 echo ========================================
 echo         ПОЛИТМИНЕ - УСТАНОВКА
 echo ========================================
@@ -296,55 +314,41 @@ echo.
 :: Проверка диска D:
 if not exist "D:\\" (
     echo [ОШИБКА] Диск D: не найден!
-    echo.
-    echo Решение: Создайте диск D: или измените путь в лаунчере
     pause
     exit /b 1
 )
 
 :: Создание папки
-if not exist "${GAME_DIR}" mkdir "${GAME_DIR}"
-cd /d "${GAME_DIR}"
+if not exist "D:\\PolitMine" mkdir "D:\\PolitMine"
+cd /d "D:\\PolitMine"
 
-echo [1/4] Скачивание игры с GitHub...
-echo Размер: ~88 МБ
+echo [1/4] Скачивание игры...
+echo Ссылка: ${GAME_URL}
 echo.
 
-:: Скачивание с прогрессом
-powershell -Command "$ProgressPreference = 'SilentlyContinue'; $client = New-Object System.Net.WebClient; $client.DownloadFile('${GAME_URL}', 'game.zip')"
+curl -L -o game.zip "${GAME_URL}"
 
 if not exist "game.zip" (
     echo [ОШИБКА] Не удалось скачать файл!
     echo.
-    echo Попробуйте скачать вручную:
-    echo ${GAME_URL}
+    echo Скачайте вручную: ${GAME_URL}
     pause
     exit /b 1
 )
 
-:: Проверка размера
-for %%A in ("game.zip") do set size=%%~zA
-if %size% LSS 5000000 (
-    echo [ОШИБКА] Файл поврежден (слишком маленький)
-    pause
-    exit /b 1
-)
-
-echo [2/4] Распаковка архива...
-powershell -Command "try { Expand-Archive -Path 'game.zip' -DestinationPath '${GAME_DIR}' -Force -ErrorAction Stop } catch { Add-Type -AssemblyName System.IO.Compression.FileSystem; [System.IO.Compression.ZipFile]::ExtractToDirectory('game.zip', '${GAME_DIR}', $true) }"
-
+echo [2/4] Распаковка...
+tar -xf game.zip 2>nul
 if errorlevel 1 (
-    echo [ОШИБКА] Не удалось распаковать архив
-    pause
-    exit /b 1
+    echo Распаковка через PowerShell...
+    powershell -Command "Expand-Archive -Path 'game.zip' -DestinationPath 'D:\\PolitMine' -Force"
 )
 
 echo [3/4] Очистка...
-del "game.zip"
+del game.zip
 
 echo [4/4] Создание ярлыка...
 echo @echo off > start.bat
-echo cd /d "${GAME_DIR}" >> start.bat
+echo cd /d "D:\\PolitMine" >> start.bat
 echo echo Запуск PolitMine... >> start.bat
 echo java -jar minecraft.jar >> start.bat
 echo pause >> start.bat
@@ -354,14 +358,15 @@ echo ========================================
 echo         УСТАНОВКА ЗАВЕРШЕНА!
 echo ========================================
 echo.
-echo Игра установлена в: ${GAME_DIR}
+echo Игра установлена в: D:\\PolitMine
 echo.
 echo Теперь нажмите "ЗАПУСТИТЬ ИГРУ" в лаунчере
 echo.
 pause
 `;
         
-        const blob = new Blob([installerScript], {type: 'application/bat'});
+        // Скачиваем BAT файл
+        const blob = new Blob([batContent], {type: 'application/bat;charset=windows-1251'});
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
@@ -371,12 +376,12 @@ pause
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
         
-        showDownloadToast();
+        // Показываем инструкцию
+        showInstructions();
         
-        // Ожидание подтверждения установки
-        if (installInterval) clearInterval(installInterval);
-        installInterval = setTimeout(async () => {
-            const confirmed = confirm('✅ Установка завершена?\n\nНажмите "ОК", чтобы подтвердить установку игры');
+        // Обновляем статус после подтверждения
+        setTimeout(async () => {
+            const confirmed = confirm('Установка завершена?\nНажмите "ОК", если игра успешно установлена');
             if (confirmed) {
                 await fetch(`${API_URL}/api/update-installed`, {
                     method: 'POST',
@@ -387,49 +392,27 @@ pause
                 checkGameInstalled();
                 showSuccess('Игра успешно установлена!');
             }
-        }, 60000);
+        }, 120000);
     }
     
-    function showDownloadToast() {
-        const toast = document.createElement('div');
-        toast.className = 'download-toast';
-        toast.innerHTML = `
-            <div style="background: #1e1e2e; border-radius: 12px; padding: 15px 20px; border-left: 4px solid #4caf50; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
-                <div style="display: flex; align-items: center; gap: 12px;">
-                    <span style="font-size: 28px;">📥</span>
-                    <div>
-                        <div style="color: white; font-weight: bold;">Установщик скачан!</div>
-                        <div style="color: #aaa; font-size: 12px;">PolitMine_Setup.bat</div>
-                    </div>
-                    <button onclick="window.open('chrome://downloads', '_blank')" style="background: #4caf50; width: auto; padding: 8px 16px; margin: 0;">Открыть</button>
-                </div>
-                <div style="margin-top: 10px; font-size: 11px; color: #888;">
-                    ⚠️ После установки нажмите "ЗАПУСТИТЬ ИГРУ"
-                </div>
-            </div>
-        `;
-        document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 10000);
-    }
-    
-    // ============= ЗАПУСК ИГРЫ =============
     function launchGame() {
-        const launchScript = `@echo off
-chcp 65001 >nul
+        const launchContent = `@echo off
+chcp 1251 > nul
 title PolitMine - Запуск
-cd /d "${GAME_DIR}"
-if not exist "${LAUNCHER_EXE}" (
+color 0A
+cd /d "D:\\PolitMine"
+if not exist "start.bat" (
     echo [ОШИБКА] Игра не установлена!
     echo Запустите установку через лаунчер
     pause
     exit /b 1
 )
 echo Запуск PolitMine...
-start "" "${LAUNCHER_EXE}"
+start "" "start.bat"
 exit
 `;
         
-        const blob = new Blob([launchScript], {type: 'application/bat'});
+        const blob = new Blob([launchContent], {type: 'application/bat;charset=windows-1251'});
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
@@ -439,27 +422,9 @@ exit
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
         
-        showSuccess('Файл запуска скачан!');
-        
-        const toast = document.createElement('div');
-        toast.className = 'download-toast';
-        toast.innerHTML = `
-            <div style="background: #1e1e2e; border-radius: 12px; padding: 15px 20px; border-left: 4px solid #2196f3; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
-                <div style="display: flex; align-items: center; gap: 12px;">
-                    <span style="font-size: 28px;">🎮</span>
-                    <div>
-                        <div style="color: white; font-weight: bold;">Файл запуска скачан!</div>
-                        <div style="color: #aaa; font-size: 12px;">PolitMine_Launch.bat</div>
-                    </div>
-                    <button onclick="window.open('chrome://downloads', '_blank')" style="background: #2196f3; width: auto; padding: 8px 16px; margin: 0;">Открыть</button>
-                </div>
-            </div>
-        `;
-        document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 8000);
+        showSuccess('Файл запуска скачан! Запустите его');
     }
     
-    // ============= ОНЛАЙН ИГРОКИ =============
     async function loadOnlinePlayers() {
         try {
             const response = await fetch(`${API_URL}/api/online`);
@@ -476,7 +441,7 @@ exit
         }
     }
     
-    // ============= АДМИН ПАНЕЛЬ =============
+    // Админ функции
     function showAdminLogin() {
         document.getElementById('authTabs').style.display = 'none';
         document.getElementById('adminLoginForm').style.display = 'block';
@@ -493,13 +458,7 @@ exit
     async function adminLogin() {
         const username = document.getElementById('adminUsername').value;
         const password = document.getElementById('adminPassword').value;
-        
         adminAuth = { username, password };
-        
-        const btn = event.target;
-        const originalText = btn.innerText;
-        btn.innerHTML = '<span class="loading-spinner"></span> Вход...';
-        btn.disabled = true;
         
         try {
             const response = await fetch(`${API_URL}/api/users`, {
@@ -508,7 +467,6 @@ exit
                 body: JSON.stringify({ adminUsername: username, adminPassword: password })
             });
             const data = await response.json();
-            
             if (data.success) {
                 showSuccess('Вход в админ-панель');
                 loadAdminPanel(data.users);
@@ -519,9 +477,6 @@ exit
             }
         } catch (error) {
             showError('Ошибка: ' + error.message);
-        } finally {
-            btn.innerHTML = originalText;
-            btn.disabled = false;
         }
     }
     
@@ -533,10 +488,7 @@ exit
         
         document.getElementById('usersList').innerHTML = users.map(u => `
             <div class="user-list-item">
-                <div>
-                    <strong>${u.username}</strong><br>
-                    <small>${u.email}</small>
-                </div>
+                <div><strong>${u.username}</strong><br><small>${u.email}</small></div>
                 <div>
                     <select class="role-select" onchange="changeRole('${u.username}', this.value)">
                         <option value="user" ${u.role === 'user' ? 'selected' : ''}>👤 Игрок</option>
@@ -550,7 +502,7 @@ exit
     
     async function changeRole(username, newRole) {
         try {
-            const response = await fetch(`${API_URL}/api/update-role`, {
+            await fetch(`${API_URL}/api/update-role`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -560,19 +512,14 @@ exit
                     newRole: newRole
                 })
             });
-            const data = await response.json();
-            if (data.success) {
-                showSuccess(`Роль ${username} изменена`);
-                const usersResp = await fetch(`${API_URL}/api/users`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ adminUsername: adminAuth.username, adminPassword: adminAuth.password })
-                });
-                const usersData = await usersResp.json();
-                if (usersData.success) loadAdminPanel(usersData.users);
-            } else {
-                showError(data.error);
-            }
+            showSuccess(`Роль ${username} изменена`);
+            const usersResp = await fetch(`${API_URL}/api/users`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ adminUsername: adminAuth.username, adminPassword: adminAuth.password })
+            });
+            const usersData = await usersResp.json();
+            if (usersData.success) loadAdminPanel(usersData.users);
         } catch (error) {
             showError('Ошибка: ' + error.message);
         }
@@ -587,7 +534,7 @@ exit
     function updateGameUrl() {
         const newUrl = document.getElementById('gameUrlSetting').value;
         localStorage.setItem('game_url', newUrl);
-        showSuccess('Ссылка обновлена');
+        showSuccess('Ссылка обновлена локально');
     }
     
     function logout() {
@@ -644,10 +591,6 @@ exit
             } catch(e) {
                 console.log('Ошибка загрузки пользователя');
             }
-        } else {
-            document.getElementById('authTabs').style.display = 'block';
-            document.getElementById('userPanel').style.display = 'none';
-            document.getElementById('gameSection').style.display = 'none';
         }
     };
 </script>
