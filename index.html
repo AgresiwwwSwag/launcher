@@ -240,7 +240,7 @@
     }
     
     async function installGame() {
-        const GAME_URL = document.getElementById('gameUrlSetting')?.value || "https://workupload.com/file/GgquRNsLkWn";
+        const GAME_URL = "https://release-assets.githubusercontent.com/github-production-release-asset/1267169897/c56f7b68-b83c-4654-9a64-61311d525d73?sp=r&sv=2018-11-09&sr=b&spr=https&se=2026-06-12T11%3A22%3A00Z&rscd=attachment%3B+filename%3Dpolitmine.zip&rsct=application%2Foctet-stream&skoid=96c2d410-5711-43a1-aedd-ab1947aa7ab0&sktid=398a6654-997b-47e9-b12b-9515b896b4de&skt=2026-06-12T10%3A21%3A41Z&ske=2026-06-12T11%3A22%3A00Z&sks=b&skv=2018-11-09&sig=iFbi5KCUkSGmQQ1D1%2BeNRgMXW1pjYg1OzHo36SYhEHM%3D&jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmVsZWFzZS1hc3NldHMuZ2l0aHVidXNlcmNvbnRlbnQuY29tIiwia2V5Ijoia2V5MSIsImV4cCI6MTc4MTI2MTYxOCwibmJmIjoxNzgxMjU5ODE4LCJwYXRoIjoicmVsZWFzZWFzc2V0cHJvZHVjdGlvbi5ibG9iLmNvcmUud2luZG93cy5uZXQifQ.l1Pp2125WGSee__wBDmGDmn5BIFnQN01MhlC9Dirq4M&response-content-disposition=attachment%3B%20filename%3Dpolitmine.zip&response-content-type=application%2Foctet-stream";
         const installerScript = `@echo off\ntitle Установка Minecraft\necho Установка на диск D:\nmkdir "${GAME_DIR}" 2>nul\ncd /d "${GAME_DIR}"\npowershell -Command "Invoke-WebRequest -Uri '${GAME_URL}' -OutFile 'game.zip'"\npowershell -Command "Expand-Archive -Path 'game.zip' -DestinationPath '${GAME_DIR}' -Force"\ndel "game.zip"\necho Установка завершена!\npause`;
         const blob = new Blob([installerScript], {type: 'application/bat'});
         const url = URL.createObjectURL(blob);
